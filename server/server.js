@@ -1,19 +1,8 @@
 const express = require('express');
-const { ApolloServer, gql }= require('apollo-server-express');
-
-// Construct a schema, using GraphQL schema language
-const typeDefs = gql`
-  type Query {
-    hello: String
-  }
-`;
-
-// Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!',
-  },
-};
+const { ApolloServer, gql } = require('apollo-server-express');
+const typeDefs = require('./schema/schema');
+const JokeCategories = require('./datasources/chuck-api');
+const resolvers = require('./resolvers/resolver');
 
 /** Initialize Apollo server and pass the type definitions (GraphQL schema),
  * resolver functions for the schema fields and lastly the datasource (which is 
@@ -23,7 +12,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   dataSources: () => ({
-
+    jokeCategories: new JokeCategories()
   })
 });
 
