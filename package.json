@@ -1,0 +1,19 @@
+{
+  "name": "chuck-graphql",
+  "version": "1.0.0",
+  "description": "GraphQL integration with the Chuck Norris API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ohssie/chuck-graphQL.git"
+  },
+  "author": "Ugendu Martins Ositadinma",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Ohssie/chuck-graphQL/issues"
+  },
+  "homepage": "https://github.com/Ohssie/chuck-graphQL#readme"
+}
