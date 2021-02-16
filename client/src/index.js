@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { ReactDOM, render } from 'react-dom';
-import './index.css';
+import { render } from 'react-dom';
+import 'semantic-ui-css/semantic.min.css'
+import { Container, Header, Dropdown, Loader, Grid } from 'semantic-ui-react'
 import reportWebVitals from './reportWebVitals';
-import { ApolloProvider, ApolloClient, InMemoryCache, gql, useQuery, useLazyQuery } from '@apollo/client';
-import Card from './components/Card';
+import { ApolloProvider, ApolloClient, InMemoryCache, gql, useQuery } from '@apollo/client';
+import { Card, Button, Divider } from 'semantic-ui-react';
 
 const client = new ApolloClient({
   uri: 'http://localhost:4000/graphql',
@@ -33,32 +34,27 @@ const GET_JOKE = gql`
 function Categories({ onCategorySelected }) {
   const { loading, error, data } = useQuery(GET_CATEGORIES);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <Loader active size='medium' inline='centered'>Loading</Loader>;
   if (error) return <p>Error! ${error.message}</p>;
 
+  const dropdownOptions = data.categories.map((data) => ({
+    key: data,
+    text: data,
+    value: data,
+  }));
+  console.log(dropdownOptions)
+
   return (
-    <select name="category" onChange={onCategorySelected}>
-      {data.categories.map((data) => (
-        <option key={data} value={data}> { data } </option>
-      ))}
-    </select>
+    <Dropdown 
+      placeholder='Select Joke Category'
+      name="category"
+      fluid
+      selection
+      options={dropdownOptions}
+      onChange={onCategorySelected}
+    />
   );
 };
-
-
-// function Categories() {
-//   const { loading, error, data } = useQuery(categories);
-//   if (loading) return <p>Loading...</p>;
-//   if (error) return <p>Error! ${error.message}</p>;
-// // console.log('ohssie')
-//   // const [getJoke, { loading, data }] = useLazyQuery(categoriesJoke);
-
-//   return data.categories.map((data) => (
-//     <div className="cards" key={data} onClick={console.log(data)}>
-//       <Card category={data}/>
-//     </div>
-//   ));
-// };
 
 function RandomJoke({ category }) {
   const { loading, error, data, refetch, networkStatus } = useQuery(GET_JOKE, {
@@ -66,18 +62,18 @@ function RandomJoke({ category }) {
     notifyOnNetworkStatusChange: true
   });
 
-  // const [getJoke, { loading, data }] = useLazyQuery(categoriesJoke);
-  if (networkStatus === 4) return <p>Refetching!</p>;
+  if (networkStatus === 4) return <Loader active size='medium' inline='centered'>Refetching!</Loader>;
   if (loading) return null;
   if (error) return `Error! ${error}`;
-  console.log(data.joke.value)
+  
   return (
     <div>
       <Card
-        category={data.joke.categories}
-        value={data.joke.value}
-        created_at={data.joke.created_at} />
-      <button onClick={() => refetch()}>Next -></button>
+        color='grey'
+        fluid
+        header={data.joke.categories}
+        description={data.joke.value}/>
+      <Button fluid secondary onClick={() => refetch()}>Next</Button>
     </div>
     
   );
@@ -87,23 +83,32 @@ function App() {
   const [category, setCategory] = useState(null);
 
   function onCategorySelected({ target }) {
-    setCategory(target.value);
+    console.log(target)
+    setCategory(target.innerText);
   }
 
   return (
     <ApolloProvider client={client}>
       <div>
-        <h2>Chuck Norris Jokes</h2>
-        <Categories onCategorySelected={onCategorySelected}/>
-        {category && <RandomJoke category={category} />}
-        {/* <RandomJoke/> */}
+        <Grid centered columns={2}>
+          <Grid.Column>
+            <Container text style={{ marginTop: 200 }}>
+              <Header as='h2' style={{ textAlign: 'center' }}>Chuck Norris Jokes</Header>
+              <Divider />
+              <Categories onCategorySelected={onCategorySelected}/>
+              <Divider />
+              {category && <RandomJoke category={category} />}
+            </Container>
+          </Grid.Column>
+
+        </Grid>
+        
       </div>
     </ApolloProvider>
   );
 }
 
 render(<App />, document.getElementById('root'));
-// ReactDOM.render(<App />, document.getElementById('root'));
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
